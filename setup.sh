@@ -16,7 +16,7 @@ cat > .env.example << 'EOF'
 FACEBOOK_TOKEN=sk-facebook-page-access-token
 FACEBOOK_PAGE_ID=your_facebook_page_id
 
-# INSTAGRAM  
+# INSTAGRAM
 INSTAGRAM_TOKEN=your_instagram_business_token
 INSTAGRAM_ACCOUNT_ID=your_instagram_business_account_id
 
@@ -43,16 +43,6 @@ echo "4. Test locally: npm start"
 echo ""
 echo "🔐 For GitHub Actions Automation:"
 echo "1. Go to your repo Settings → Secrets and variables → Actions"
-echo "2. Add each secret from your .env file:"
-echo "   - FACEBOOK_TOKEN"
-echo "   - FACEBOOK_PAGE_ID"
-echo "   - INSTAGRAM_TOKEN"
-echo "   - INSTAGRAM_ACCOUNT_ID"
-echo "   - TIKTOK_TOKEN"
-echo "   - WHATSAPP_TOKEN"
-echo "   - WHATSAPP_PHONE_ID"
-echo "   - WHATSAPP_RECIPIENT"
-echo ""
-echo "3. Create workflow file: .github/workflows/daily-post.yml"
-echo "4. The automation will run daily at 8 AM SAST"
+echo "2. Add each secret from your .env file"
+echo "3. Workflow will run daily at 8 AM SAST"
 echo ""
