@@ -1,0 +1,30 @@
+{
+  "name": "the-corner-agent",
+  "version": "1.0.0",
+  "description": "Automated social media agent for The Corner businesses",
+  "main": "business-scheduler.js",
+  "scripts": {
+    "start": "node business-scheduler.js",
+    "schedule": "node business-scheduler.js --schedule daily",
+    "post": "node business-scheduler.js --action post",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "social-media",
+    "automation",
+    "scheduler",
+    "facebook",
+    "instagram",
+    "tiktok",
+    "whatsapp"
+  ],
+  "author": "KINGNOA99",
+  "license": "MIT",
+  "dependencies": {
+    "node-fetch": "^2.6.11",
+    "uuid": "^9.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
