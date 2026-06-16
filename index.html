@@ -1,0 +1,2080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="The Corner Agent">
+<meta name="theme-color" content="#0A0A0A">
+<title>The Corner · Social Media Agent</title>
+<style>
+  :root {
+    --gold: #D4A843;
+    --gold-light: #E8C87A;
+    --gold-dim: rgba(212,168,67,0.15);
+    --black: #0A0A0A;
+    --dark: #111111;
+    --mid: #1A1A1A;
+    --border: #2a2a2a;
+    --green: #25D366;
+    --green-dim: rgba(37,211,102,0.15);
+    --blue: #3B82F6;
+    --blue-dim: rgba(59,130,246,0.15);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    background: var(--black);
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+  .header {
+    background: linear-gradient(135deg, #0A0A0A 0%, #1A1500 100%);
+    border-bottom: 3px solid var(--gold);
+    padding: 16px 16px 0;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .logo-pill { background: var(--gold); color: var(--black); font-weight: 900; font-size: 10px; padding: 3px 10px; border-radius: 20px; letter-spacing: 2px; }
+  .title { font-size: 20px; font-weight: 900; line-height: 1.1; margin-top: 6px; }
+  .title span { color: var(--gold); }
+  .countdown-box {
+    background: var(--mid); border: 1px solid rgba(212,168,67,0.3);
+    border-radius: 12px; padding: 8px 12px; text-align: center; min-width: 72px;
+  }
+  .countdown-num { font-size: 28px; font-weight: 900; color: var(--gold); font-variant-numeric: tabular-nums; line-height: 1; }
+  .countdown-label { color: #666; font-size: 8px; margin-top: 2px; letter-spacing: 2px; }
+  .tabs { display: flex; gap: 0; overflow-x: auto; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    background: transparent; color: #555; border: none;
+    padding: 10px 14px; font-weight: 700; font-size: 12px;
+    border-radius: 10px 10px 0 0; white-space: nowrap; cursor: pointer;
+    transition: all 0.2s; flex-shrink: 0;
+  }
+  .tab.active { background: var(--gold); color: var(--black); }
+  .tab .badge {
+    background: #EF4444; color: #fff; font-size: 9px; font-weight: 900;
+    padding: 1px 5px; border-radius: 10px; margin-left: 4px;
+  }
+  .content { padding: 18px 14px; }
+  .section-label { color: var(--gold); font-size: 9px; font-weight: 700; letter-spacing: 3px; margin-bottom: 12px; }
+  .card {
+    background: var(--mid); border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px; margin-bottom: 12px;
+  }
+  .card-gold { border-color: rgba(212,168,67,0.3); }
+  .card-green { border-color: rgba(37,211,102,0.3); }
+  .card-blue { border-color: rgba(59,130,246,0.3); }
+  label { color: #888; font-size: 11px; display: block; margin-bottom: 5px; }
+  input, textarea, select {
+    width: 100%; background: #0D0D0D; border: 1px solid #333;
+    color: #fff; border-radius: 10px; padding: 11px 13px; font-size: 14px;
+    outline: none; font-family: inherit; -webkit-appearance: none;
+  }
+  textarea { resize: vertical; line-height: 1.6; }
+  input[type="date"] { color-scheme: dark; }
+  input[type="time"] { color-scheme: dark; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .form-field { margin-bottom: 12px; }
+  .platform-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .platform-btn {
+    border: 2px solid var(--border); border-radius: 12px;
+    padding: 12px 6px; cursor: pointer; text-align: center;
+    font-weight: 700; font-size: 11px; transition: all 0.2s;
+    background: #0D0D0D; color: #555;
+  }
+  .platform-btn .emoji { font-size: 22px; display: block; margin-bottom: 4px; }
+  .platform-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(212,168,67,0.1); }
+  .days-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+  .day-btn {
+    border: 2px solid var(--border); border-radius: 10px;
+    padding: 8px 16px; cursor: pointer; font-weight: 700; font-size: 13px;
+    background: #0D0D0D; color: #666; transition: all 0.2s;
+  }
+  .day-btn.active { background: var(--gold); color: var(--black); border-color: var(--gold); }
+  .generate-btn {
+    width: 100%; background: var(--gold); color: var(--black);
+    border: none; border-radius: 14px; padding: 18px;
+    font-size: 15px; font-weight: 900; cursor: pointer;
+    letter-spacing: 1px; transition: all 0.2s;
+    box-shadow: 0 0 32px rgba(212,168,67,0.3);
+  }
+  .generate-btn:disabled {
+    background: #2a2a2a; color: #555; box-shadow: none;
+  }
+  .analyze-btn {
+    width: 100%; background: var(--blue-dim); color: var(--blue);
+    border: 1px solid rgba(59,130,246,0.3); border-radius: 10px;
+    padding: 12px; font-size: 13px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    margin-top: 10px;
+  }
+  .analyze-btn:disabled {
+    background: #1a1a2a; color: #555; border-color: #333;
+  }
+  .plan-card {
+    background: var(--mid); border: 1px solid var(--border);
+    border-radius: 14px; margin-bottom: 10px; overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .plan-card.open { border-color: rgba(212,168,67,0.4); }
+  .plan-card.scheduled { border-color: rgba(37,211,102,0.4); }
+  .plan-header {
+    padding: 14px; display: flex; align-items: center; gap: 10px;
+    cursor: pointer;
+  }
+  .plan-icon {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--gold-dim); border: 2px solid var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .plan-icon.scheduled {
+    background: var(--green-dim); border-color: var(--green);
+  }
+  .plan-meta { flex: 1; min-width: 0; }
+  .plan-title { font-weight: 800; font-size: 13px; }
+  .plan-sub { color: #666; font-size: 11px; margin-top: 2px; }
+  .plan-arrow { color: #444; font-size: 20px; transition: transform 0.3s; flex-shrink: 0; }
+  .plan-card.open .plan-arrow { transform: rotate(90deg); color: var(--gold); }
+  .plan-card.scheduled .plan-arrow { color: var(--green); }
+  .plan-body { padding: 0 14px 14px; border-top: 1px solid var(--border); }
+  .caption-box {
+    background: #0D0D0D; border: 1px solid #2a2a2a;
+    border-radius: 10px; padding: 13px; margin-top: 12px;
+    font-family: 'Courier New', monospace; font-size: 12px;
+    color: #E0E0E0; line-height: 1.7; min-height: 60px;
+  }
+  .cursor { color: var(--gold); animation: blink 1s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .info-box { background: #0D0D0D; border: 1px solid #2a2a2a; border-radius: 10px; padding: 10px; }
+  .info-label { font-size: 9px; font-weight: 700; letter-spacing: 2px; margin-bottom: 5px; }
+  .info-text { color: #ccc; font-size: 11px; line-height: 1.6; }
+  .hashtag-row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+  .hashtag {
+    background: rgba(212,168,67,0.1); color: var(--gold);
+    border: 1px solid rgba(212,168,67,0.25); border-radius: 20px;
+    padding: 2px 8px; font-size: 10px; font-family: monospace;
+  }
+  .time-bar {
+    background: #0D0D0D; border-radius: 8px; padding: 8px 10px;
+    display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 11px;
+  }
+  .schedule-actions {
+    display: flex; gap: 8px; margin-top: 12px;
+  }
+  .schedule-btn {
+    flex: 1; background: var(--green-dim); color: var(--green);
+    border: 1px solid rgba(37,211,102,0.3); border-radius: 10px;
+    padding: 12px; font-size: 13px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .schedule-btn:disabled {
+    background: #1a1a1a; color: #555; border-color: #333;
+  }
+  .post-now-btn {
+    flex: 1; background: var(--gold-dim); color: var(--gold);
+    border: 1px solid rgba(212,168,67,0.3); border-radius: 10px;
+    padding: 12px; font-size: 13px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .queue-item {
+    background: var(--mid); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px; margin-bottom: 10px;
+  }
+  .queue-item.scheduled { border-color: rgba(37,211,102,0.3); }
+  .queue-item.posted { border-color: rgba(100,100,100,0.3); opacity: 0.6; }
+  .queue-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .queue-status {
+    font-size: 9px; font-weight: 700; padding: 2px 8px; border-radius: 20px;
+  }
+  .status-scheduled { background: var(--green-dim); color: var(--green); }
+  .status-posted { background: #2a2a2a; color: #888; }
+  .queue-time { color: #888; font-size: 11px; }
+  .queue-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .queue-btn {
+    flex: 1; background: #0D0D0D; border: 1px solid #333;
+    color: #888; border-radius: 8px; padding: 8px;
+    font-size: 11px; font-weight: 700; cursor: pointer;
+  }
+  .queue-btn.primary { color: var(--gold); border-color: rgba(212,168,67,0.3); }
+  .queue-btn.danger { color: #EF4444; border-color: rgba(239,68,68,0.3); }
+  .badge {
+    border-radius: 20px; padding: 2px 8px; font-size: 10px;
+    font-weight: 700; display: inline-flex; align-items: center; gap: 3px;
+    margin-right: 3px; margin-bottom: 3px;
+  }
+  .tool-card { background: var(--mid); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 10px; display: flex; gap: 12px; align-items: flex-start; }
+  .tool-icon { font-size: 28px; flex-shrink: 0; }
+  .free-badge { background: #14532D; color: #4ADE80; font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+  .phase-row { display: flex; gap: 12px; margin-bottom: 14px; align-items: flex-start; }
+  .phase-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .cta-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: flex-start; }
+  .cta-tag { background: var(--gold); color: var(--black); font-size: 9px; font-weight: 900; padding: 3px 7px; border-radius: 6px; flex-shrink: 0; margin-top: 1px; letter-spacing: 1px; }
+  .api-screen {
+    position: fixed; inset: 0; background: var(--black); z-index: 200;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .api-screen .logo { background: var(--gold); color: var(--black); font-weight: 900; font-size: 32px; padding: 12px 24px; border-radius: 16px; margin-bottom: 24px; }
+  .api-screen h2 { font-size: 18px; font-weight: 900; margin-bottom: 8px; }
+  .api-screen p { color: #888; font-size: 13px; text-align: center; line-height: 1.7; margin-bottom: 20px; }
+  .api-input { width: 100%; background: #0D0D0D; border: 2px solid #333; color: #fff; border-radius: 12px; padding: 13px; font-size: 13px; font-family: monospace; outline: none; margin-bottom: 12px; }
+  .api-btn { width: 100%; background: var(--gold); color: var(--black); border: none; border-radius: 12px; padding: 16px; font-size: 15px; font-weight: 900; cursor: pointer; }
+  .api-note { color: #444; font-size: 10px; text-align: center; margin-top: 12px; line-height: 1.6; }
+  .api-link { color: var(--gold); text-decoration: none; }
+  .provider-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; width: 100%; }
+  .provider-btn {
+    border: 2px solid #333; border-radius: 12px;
+    padding: 12px 8px; cursor: pointer; text-align: center;
+    font-weight: 700; font-size: 12px; transition: all 0.2s;
+    background: #0D0D0D; color: #555;
+  }
+  .provider-btn .p-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+  .provider-btn .p-name { font-size: 13px; }
+  .provider-btn .p-desc { font-size: 10px; color: #666; font-weight: 400; margin-top: 2px; }
+  .provider-btn.active {
+    border-color: var(--gold); color: var(--gold);
+    background: rgba(212,168,67,0.1);
+  }
+  .provider-badge {
+    display: inline-block; padding: 1px 6px; border-radius: 10px;
+    font-size: 9px; font-weight: 700; margin-top: 4px;
+  }
+  .badge-free { background: #14532D; color: #4ADE80; }
+  .badge-cheap { background: #1E3A5F; color: #60A5FA; }
+  .badge-premium { background: #4A1D1D; color: #F87171; }
+  .error-box { background: #2D0A0A; color: #FF6B6B; border-radius: 10px; padding: 12px; margin-bottom: 14px; font-size: 12px; line-height: 1.5; }
+  .empty-state { text-align: center; padding: 50px 20px; }
+  .empty-state .icon { font-size: 48px; margin-bottom: 14px; }
+  .empty-state p { color: #666; font-size: 13px; line-height: 1.6; }
+  .small-btn { background: var(--gold); color: var(--black); border: none; border-radius: 10px; padding: 10px 20px; font-weight: 700; cursor: pointer; margin-top: 14px; font-size: 13px; }
+  .loading-dots::after {
+    content: '...';
+    animation: dots 1.5s infinite;
+  }
+  @keyframes dots {
+    0%{content:'.'} 33%{content:'..'} 66%{content:'...'} 100%{content:'.'}
+  }
+  .regen-btn { background: #1a1a1a; color: #888; border: 1px solid #333; border-radius: 8px; padding: 7px 14px; cursor: pointer; font-size: 12px; }
+  .type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .type-btn {
+    border: 2px solid var(--border); border-radius: 12px;
+    padding: 14px 8px; cursor: pointer; text-align: center;
+    font-weight: 700; font-size: 12px; transition: all 0.2s;
+    background: #0D0D0D; color: #555;
+  }
+  .type-btn .emoji { font-size: 24px; display: block; margin-bottom: 6px; }
+  .type-btn.active {
+    border-color: var(--gold); color: var(--gold);
+    background: rgba(212,168,67,0.1);
+  }
+  .preset-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; }
+  .preset-row::-webkit-scrollbar { display: none; }
+  .preset-chip {
+    background: #0D0D0D; border: 1px solid #333; border-radius: 20px;
+    padding: 6px 14px; font-size: 11px; color: #888; cursor: pointer;
+    white-space: nowrap; flex-shrink: 0; transition: all 0.2s;
+  }
+  .preset-chip:hover, .preset-chip.active {
+    border-color: var(--gold); color: var(--gold);
+    background: rgba(212,168,67,0.1);
+  }
+  .media-dropzone {
+    border: 2px dashed #333;
+    border-radius: 14px;
+    padding: 24px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #0D0D0D;
+    margin-bottom: 12px;
+  }
+  .media-dropzone.dragover {
+    border-color: var(--gold);
+    background: rgba(212,168,67,0.05);
+  }
+  .media-dropzone .dz-icon { font-size: 32px; margin-bottom: 8px; }
+  .media-dropzone .dz-text { color: #888; font-size: 13px; font-weight: 600; }
+  .media-dropzone .dz-hint { color: #555; font-size: 11px; margin-top: 4px; }
+  .media-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .media-thumb {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #333;
+    background: #0D0D0D;
+  }
+  .media-thumb img, .media-thumb video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .media-thumb .thumb-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .media-thumb:hover .thumb-overlay { opacity: 1; }
+  .media-thumb .thumb-type {
+    position: absolute;
+    top: 4px; right: 4px;
+    background: rgba(0,0,0,0.7);
+    color: #fff;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-weight: 700;
+  }
+  .media-thumb .thumb-remove {
+    background: #EF4444;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .plan-media-strip {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 12px 0;
+    scrollbar-width: none;
+  }
+  .plan-media-strip::-webkit-scrollbar { display: none; }
+  .plan-media-item {
+    flex-shrink: 0;
+    width: 120px;
+    height: 120px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #333;
+    position: relative;
+    cursor: pointer;
+  }
+  .plan-media-item img, .plan-media-item video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .plan-media-item .pm-label {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    color: #fff;
+    font-size: 10px;
+    padding: 8px 6px 4px;
+    font-weight: 700;
+  }
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.95);
+    z-index: 300;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 20px;
+  }
+  .lightbox.active { display: flex; }
+  .lightbox img, .lightbox video {
+    max-width: 100%;
+    max-height: 70vh;
+    border-radius: 12px;
+  }
+  .lightbox-close {
+    position: absolute;
+    top: 16px; right: 16px;
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: #fff;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  .lightbox-caption {
+    color: #888;
+    font-size: 13px;
+    margin-top: 12px;
+    text-align: center;
+  }
+  .copy-btn {
+    background: var(--gold-dim);
+    border: 1px solid rgba(212,168,67,0.3);
+    color: var(--gold);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .copy-btn.copied {
+    background: #14532D;
+    color: #4ADE80;
+    border-color: #14532D;
+  }
+  .media-badge {
+    background: rgba(212,168,67,0.15);
+    color: var(--gold);
+    border: 1px solid rgba(212,168,67,0.3);
+    border-radius: 20px;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    margin-left: 6px;
+  }
+  .provider-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--gold-dim);
+    border: 1px solid rgba(212,168,67,0.3);
+    color: var(--gold);
+    border-radius: 20px;
+    padding: 2px 10px;
+    font-size: 10px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .model-select {
+    width: 100%;
+    background: #0D0D0D;
+    border: 1px solid #333;
+    color: #fff;
+    border-radius: 10px;
+    padding: 11px 13px;
+    font-size: 13px;
+    margin-bottom: 12px;
+    outline: none;
+  }
+  .model-select option {
+    background: #0D0D0D;
+    color: #fff;
+  }
+  .model-label {
+    color: #888;
+    font-size: 11px;
+    margin-bottom: 5px;
+    display: block;
+  }
+  .whatsapp-settings {
+    background: var(--green-dim);
+    border: 1px solid rgba(37,211,102,0.2);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .whatsapp-settings label {
+    color: var(--green);
+  }
+  .contact-settings {
+    background: var(--blue-dim);
+    border: 1px solid rgba(59,130,246,0.2);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .contact-settings label {
+    color: var(--blue);
+  }
+  .analysis-result {
+    background: #0D0D0D;
+    border: 1px solid rgba(59,130,246,0.3);
+    border-radius: 10px;
+    padding: 12px;
+    margin-top: 10px;
+    font-size: 12px;
+    color: #ccc;
+    line-height: 1.6;
+  }
+  .analysis-result .ai-label {
+    color: var(--blue);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+</style>
+</head>
+<body>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img id="lightboxImg" style="display:none;">
+  <video id="lightboxVideo" controls style="display:none;"></video>
+  <div class="lightbox-caption" id="lightboxCaption"></div>
+</div>
+
+<!-- API KEY SCREEN -->
+<div class="api-screen" id="apiScreen">
+  <div class="logo">THE CORNER</div>
+  <h2>Social Media Agent</h2>
+  <p>Choose your AI provider, select a model, and enter your API key. Your key stays on this device only.</p>
+
+  <div class="provider-grid">
+    <button class="provider-btn active" id="prov-anthropic" onclick="setProvider('anthropic', this)">
+      <span class="p-icon">🟣</span>
+      <span class="p-name">Anthropic</span>
+      <span class="p-desc">Claude · Best captions</span>
+      <span class="provider-badge badge-premium">$$$</span>
+    </button>
+    <button class="provider-btn" id="prov-openai" onclick="setProvider('openai', this)">
+      <span class="p-icon">🟢</span>
+      <span class="p-name">OpenAI</span>
+      <span class="p-desc">GPT-4o · Reliable</span>
+      <span class="provider-badge badge-premium">$$</span>
+    </button>
+    <button class="provider-btn" id="prov-gemini" onclick="setProvider('gemini', this)">
+      <span class="p-icon">🔵</span>
+      <span class="p-name">Google Gemini</span>
+      <span class="p-desc">Free tier available</span>
+      <span class="provider-badge badge-free">FREE</span>
+    </button>
+    <button class="provider-btn" id="prov-groq" onclick="setProvider('groq', this)">
+      <span class="p-icon">⚡</span>
+      <span class="p-name">Groq</span>
+      <span class="p-desc">Fast & cheap</span>
+      <span class="provider-badge badge-cheap">R</span>
+    </button>
+  </div>
+
+  <div id="modelSelector" style="display:none; width:100%; margin-bottom:12px;">
+    <label class="model-label">Select Model</label>
+    <select class="model-select" id="geminiModel" onchange="updateGeminiModel(this.value)">
+      <optgroup label="Standard Gemini API (AIza keys)">
+        <option value="gemini-2.5-flash">gemini-2.5-flash ✅ Recommended</option>
+        <option value="gemini-2.5-pro">gemini-2.5-pro</option>
+      </optgroup>
+      <optgroup label="Vertex AI (AQ keys)">
+        <option value="gemini-2.5-flash" selected>gemini-2.5-flash ✅ Recommended</option>
+        <option value="gemini-2.5-pro">gemini-2.5-pro</option>
+        <option value="gemini-3-flash-preview">gemini-3-flash-preview</option>
+        <option value="gemini-3-pro-preview">gemini-3-pro-preview</option>
+      </optgroup>
+    </select>
+  </div>
+
+  <input class="api-input" id="apiKeyInput" type="password" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false">
+  <button class="api-btn" onclick="saveKey()">Start Creating ⚡</button>
+
+  <p class="api-note">
+    <span id="keyHint">Get a free key at <a class="api-link" href="https://console.anthropic.com" target="_blank" id="keyLink">console.anthropic.com</a></span><br>
+    Your key stays on your phone only.
+  </p>
+  <p style="color:#333; font-size:10px; margin-top: 16px;">Or <span onclick="skipKey()" style="color:var(--gold); cursor:pointer;">skip to explore the app →</span></p>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" style="display:none;">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:6px;">
+          <span class="logo-pill">THE CORNER</span>
+          <span id="phaseBadge" style="font-size:10px; font-weight:700; padding:3px 10px; border-radius:20px;"></span>
+        </div>
+        <div class="title">Business & Event<br><span>Social Agent</span></div>
+        <div style="color:#666; font-size:11px; margin-top:4px;">AI content + media planner for township entrepreneurs</div>
+      </div>
+      <div class="countdown-box">
+        <div class="countdown-num" id="daysLeft">—</div>
+        <div class="countdown-label">DAYS</div>
+        <div style="color:#555; font-size:8px; margin-top:2px;">to launch</div>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('planner', this)">⚡ Planner</button>
+      <button class="tab" onclick="switchTab('plans', this)">📅 Plans</button>
+      <button class="tab" onclick="switchTab('queue', this)">📤 Queue <span class="badge" id="queueBadge" style="display:none;">0</span></button>
+      <button class="tab" onclick="switchTab('tools', this)">🛠 Tools</button>
+      <button class="tab" onclick="switchTab('strategy', this)">🎯 Strategy</button>
+    </div>
+  </div>
+
+  <!-- PLANNER TAB -->
+  <div class="content" id="tab-planner">
+    <div class="provider-chip" id="activeProviderChip">🟣 Anthropic Claude</div>
+
+    <p style="color:#888; font-size:13px; margin-bottom:18px; line-height:1.6;">Pick your promotion type, upload your media, and let AI build daily posts with captions, CTAs, and timing.</p>
+
+    <!-- WHATSAPP SETTINGS -->
+    <div class="card card-green">
+      <div class="section-label" style="color:var(--green);">📱 YOUR WHATSAPP</div>
+      <div class="whatsapp-settings">
+        <div class="form-field">
+          <label>Your WhatsApp Number</label>
+          <input id="whatsappNumber" type="tel" placeholder="27812345678" value="">
+        </div>
+        <p style="color:#888; font-size:11px; margin-top:8px; line-height:1.5;">
+          With country code, no spaces. You'll get reminders here when it's time to post.
+        </p>
+      </div>
+    </div>
+
+    <!-- BUSINESS CONTACT -->
+    <div class="card card-blue">
+      <div class="section-label" style="color:var(--blue);">📞 BUSINESS CONTACT</div>
+      <div class="contact-settings">
+        <div class="form-row">
+          <div class="form-field">
+            <label>WhatsApp Business Link</label>
+            <input id="whatsappLink" type="url" placeholder="https://wa.me/27812345678" value="">
+          </div>
+          <div class="form-field">
+            <label>Business Phone</label>
+            <input id="businessPhone" type="tel" placeholder="081 234 5678" value="">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Instagram Handle</label>
+            <input id="instagramHandle" type="text" placeholder="@thecorner_za" value="">
+          </div>
+          <div class="form-field">
+            <label>Facebook Page</label>
+            <input id="facebookPage" type="text" placeholder="The Corner SA" value="">
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Website / Link in Bio</label>
+          <input id="websiteLink" type="url" placeholder="https://thecorner.co.za" value="">
+        </div>
+        <p style="color:#888; font-size:11px; margin-top:8px; line-height:1.5;">
+          These get added to captions automatically. AI will reference them in CTAs.
+        </p>
+      </div>
+    </div>
+
+    <!-- PROMOTION TYPE -->
+    <div class="card">
+      <div class="section-label">WHAT ARE YOU PROMOTING?</div>
+      <div class="type-grid">
+        <button class="type-btn active" id="type-event" onclick="setType('event', this)">
+          <span class="emoji">🎪</span>Event / Market
+        </button>
+        <button class="type-btn" id="type-business" onclick="setType('business', this)">
+          <span class="emoji">🏪</span>My Business
+        </button>
+        <button class="type-btn" id="type-product" onclick="setType('product', this)">
+          <span class="emoji">🛍️</span>Product / Service
+        </button>
+        <button class="type-btn" id="type-brand" onclick="setType('brand', this)">
+          <span class="emoji">🔥</span>Brand Awareness
+        </button>
+      </div>
+    </div>
+
+    <!-- QUICK PRESETS -->
+    <div class="card" id="presetCard" style="display:none;">
+      <div class="section-label">QUICK START TEMPLATES</div>
+      <div class="preset-row" id="presetRow">
+        <span class="preset-chip" onclick="loadPreset('popup')">🎪 Pop-Up Market</span>
+        <span class="preset-chip" onclick="loadPreset('o268')">⭐ O268 Summit</span>
+        <span class="preset-chip" onclick="loadPreset('food')">🍲 Food Stall</span>
+        <span class="preset-chip" onclick="loadPreset('fashion')">👗 Fashion</span>
+        <span class="preset-chip" onclick="loadPreset('auto')">🚗 Auto Service</span>
+      </div>
+    </div>
+
+    <!-- MEDIA UPLOAD -->
+    <div class="card">
+      <div class="section-label">YOUR MEDIA <span style="color:#555; font-weight:400;">· Photos & Videos</span></div>
+      <div class="media-dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+        <div class="dz-icon">📤</div>
+        <div class="dz-text">Tap to upload photos or videos</div>
+        <div class="dz-hint">JPG, PNG, MP4, MOV · Max 10 files · 50MB each</div>
+      </div>
+      <input type="file" id="fileInput" multiple accept="image/*,video/*" style="display:none;" onchange="handleFiles(this.files)">
+      <div class="media-gallery" id="mediaGallery"></div>
+      <p style="color:#555; font-size:11px; text-align:center;" id="mediaHint">No media uploaded yet. Add photos of your product, stall, or event setup.</p>
+
+      <!-- AI ANALYZE BUTTON -->
+      <button class="analyze-btn" id="analyzeBtn" onclick="analyzeMedia()" disabled>
+        🔮 AI Analyze Media
+      </button>
+      <div id="analysisResult" style="display:none;"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-label">CAMPAIGN DETAILS</div>
+      <div class="form-row">
+        <div class="form-field">
+          <label id="nameLabel">Event / Business Name</label>
+          <input id="eventName" type="text" value="The Corner Launch">
+        </div>
+        <div class="form-field">
+          <label id="dateLabel">Target Date</label>
+          <input id="eventDate" type="date" value="2026-07-15">
+        </div>
+      </div>
+      <div class="form-field">
+        <label id="vibeLabel">Description / Vibe <span style="color:#555; font-weight:400;">(or let AI analyze your media)</span></label>
+        <textarea id="eventVibe" rows="3" placeholder="Describe what you're promoting, or upload media above and hit AI Analyze">Connecting local township businesses with customers through our new directory platform. Grand opening with live music, food stalls, and fashion vendors.</textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label>Location / Community</label>
+          <input id="community" type="text" value="Brits, North West">
+        </div>
+        <div class="form-field">
+          <label>Category</label>
+          <select id="category">
+            <option value="General">General</option>
+            <option value="Food & Catering">Food & Catering</option>
+            <option value="Fashion & Clothing">Fashion & Clothing</option>
+            <option value="Automotive">Automotive</option>
+            <option value="Beauty & Wellness">Beauty & Wellness</option>
+            <option value="Events & Entertainment">Events & Entertainment</option>
+            <option value="Home & Services">Home & Services</option>
+            <option value="Tech & Digital">Tech & Digital</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-label">PLATFORMS</div>
+      <div class="platform-grid">
+        <button class="platform-btn active" id="btn-facebook" onclick="togglePlatform('facebook', this)" style="border-color:#1877F2; color:#1877F2; background:rgba(24,119,242,0.1);">
+          <span class="emoji">📘</span>Facebook
+        </button>
+        <button class="platform-btn active" id="btn-instagram" onclick="togglePlatform('instagram', this)" style="border-color:#E1306C; color:#E1306C; background:rgba(225,48,108,0.1);">
+          <span class="emoji">📸</span>Instagram
+        </button>
+        <button class="platform-btn active" id="btn-tiktok" onclick="togglePlatform('tiktok', this)" style="border-color:#69C9D0; color:#69C9D0; background:rgba(105,201,208,0.1);">
+          <span class="emoji">🎵</span>TikTok
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-label">PLAN LENGTH</div>
+      <div class="days-grid">
+        <button class="day-btn" onclick="setDays(3, this)">3 Days</button>
+        <button class="day-btn active" onclick="setDays(7, this)">7 Days</button>
+        <button class="day-btn" onclick="setDays(10, this)">10 Days</button>
+        <button class="day-btn" onclick="setDays(14, this)">14 Days</button>
+        <button class="day-btn" onclick="setDays(30, this)">30 Days</button>
+      </div>
+    </div>
+
+    <div class="error-box" id="errorBox" style="display:none;"></div>
+
+    <button class="generate-btn" id="generateBtn" onclick="generatePlan()">
+      ⚡ GENERATE 7-DAY PLAN
+    </button>
+
+    <p style="color:#333; font-size:11px; text-align:center; margin-top:10px;">
+      <span onclick="showApiScreen()" style="color:#555; cursor:pointer;">🔑 Change Provider / Key</span>
+    </p>
+  </div>
+
+  <!-- PLANS TAB -->
+  <div class="content" id="tab-plans" style="display:none;">
+    <div id="plansEmpty" class="empty-state">
+      <div class="icon">📅</div>
+      <p>No plans yet. Go to ⚡ Planner, fill in your details and hit Generate.</p>
+      <button class="small-btn" onclick="switchTabById('planner')">Go to Planner →</button>
+    </div>
+    <div id="plansContent" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <div>
+          <div style="font-weight:800; font-size:15px;" id="plansTitle">Your Plan</div>
+          <div style="color:#666; font-size:11px; margin-top:2px;">Tap any day to expand · Schedule posts for auto-reminders</div>
+        </div>
+        <button class="regen-btn" onclick="switchTabById('planner')">↩ Redo</button>
+      </div>
+      <div id="plansList"></div>
+    </div>
+  </div>
+
+  <!-- QUEUE TAB -->
+  <div class="content" id="tab-queue" style="display:none;">
+    <div id="queueEmpty" class="empty-state">
+      <div class="icon">📤</div>
+      <p>No scheduled posts. Generate a plan and hit "Schedule" on any day.</p>
+      <button class="small-btn" onclick="switchTabById('planner')">Go to Planner →</button>
+    </div>
+    <div id="queueContent" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <div>
+          <div style="font-weight:800; font-size:15px;">Scheduled Posts</div>
+          <div style="color:#666; font-size:11px; margin-top:2px;">You'll get WhatsApp reminders at post time</div>
+        </div>
+        <button class="regen-btn" onclick="clearAllScheduled()">Clear All</button>
+      </div>
+      <div id="queueList"></div>
+    </div>
+  </div>
+
+  <!-- TOOLS TAB -->
+  <div class="content" id="tab-tools" style="display:none;">
+    <p style="color:#888; font-size:13px; margin-bottom:16px; line-height:1.6;">Best free tools to schedule and create content for your township business.</p>
+
+    <div class="tool-card">
+      <div class="tool-icon">📘</div>
+      <div>
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+          <span style="font-weight:700; font-size:13px;">Meta Business Suite</span>
+          <span class="free-badge">FREE</span>
+        </div>
+        <div style="color:#888; font-size:12px; margin-bottom:7px; line-height:1.5;">Schedule Facebook & Instagram posts natively. Best for SA township businesses with strong community groups.</div>
+        <div><span class="badge" style="background:rgba(24,119,242,0.2); color:#1877F2; border:1px solid rgba(24,119,242,0.3);">📘 Facebook</span><span class="badge" style="background:rgba(225,48,108,0.2); color:#E1306C; border:1px solid rgba(225,48,108,0.3);">📸 Instagram</span></div>
+      </div>
+    </div>
+
+    <div class="tool-card">
+      <div class="tool-icon">🟦</div>
+      <div>
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+          <span style="font-weight:700; font-size:13px;">Buffer</span>
+          <span class="free-badge">FREE</span>
+        </div>
+        <div style="color:#888; font-size:12px; margin-bottom:7px; line-height:1.5;">Free plan: 3 channels, 10 posts each. Great for queuing your whole week. Works on phone.</div>
+        <div><span class="badge" style="background:rgba(24,119,242,0.2); color:#1877F2; border:1px solid rgba(24,119,242,0.3);">📘 Facebook</span><span class="badge" style="background:rgba(225,48,108,0.2); color:#E1306C; border:1px solid rgba(225,48,108,0.3);">📸 Instagram</span><span class="badge" style="background:rgba(105,201,208,0.2); color:#69C9D0; border:1px solid rgba(105,201,208,0.3);">🎵 TikTok</span></div>
+      </div>
+    </div>
+
+    <div class="tool-card">
+      <div class="tool-icon">✂️</div>
+      <div>
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+          <span style="font-weight:700; font-size:13px;">CapCut</span>
+          <span class="free-badge">FREE</span>
+        </div>
+        <div style="color:#888; font-size:12px; margin-bottom:7px; line-height:1.5;">Free phone video editor with trending templates. Auto-captions, music, transitions. Perfect for township content creators.</div>
+        <div><span class="badge" style="background:rgba(105,201,208,0.2); color:#69C9D0; border:1px solid rgba(105,201,208,0.3);">🎵 TikTok</span><span class="badge" style="background:rgba(225,48,108,0.2); color:#E1306C; border:1px solid rgba(225,48,108,0.3);">📸 Instagram</span></div>
+      </div>
+    </div>
+
+    <div class="tool-card">
+      <div class="tool-icon">🌸</div>
+      <div>
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+          <span style="font-weight:700; font-size:13px;">Later</span>
+          <span class="free-badge">FREE</span>
+        </div>
+        <div style="color:#888; font-size:12px; margin-bottom:7px; line-height:1.5;">Visual drag-and-drop scheduler. See your whole IG grid before posting. Free plan available.</div>
+        <div><span class="badge" style="background:rgba(225,48,108,0.2); color:#E1306C; border:1px solid rgba(225,48,108,0.3);">📸 Instagram</span><span class="badge" style="background:rgba(105,201,208,0.2); color:#69C9D0; border:1px solid rgba(105,201,208,0.3);">🎵 TikTok</span></div>
+      </div>
+    </div>
+
+    <div class="tool-card">
+      <div class="tool-icon">📋</div>
+      <div>
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+          <span style="font-weight:700; font-size:13px;">Canva</span>
+          <span class="free-badge">FREE</span>
+        </div>
+        <div style="color:#888; font-size:12px; margin-bottom:7px; line-height:1.5;">Design flyers, price lists, and social posts in minutes. Templates for SA township businesses.</div>
+        <div><span class="badge" style="background:rgba(24,119,242,0.2); color:#1877F2; border:1px solid rgba(24,119,242,0.3);">📘 Facebook</span><span class="badge" style="background:rgba(225,48,108,0.2); color:#E1306C; border:1px solid rgba(225,48,108,0.3);">📸 Instagram</span></div>
+      </div>
+    </div>
+
+    <div class="card card-gold">
+      <div class="section-label">BEST POSTING TIMES · SA TOWNSHIP AUDIENCE</div>
+      <div style="background:#0D0D0D; border-radius:10px; padding:11px; margin-bottom:8px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="badge" style="background:rgba(24,119,242,0.2); color:#1877F2; border:1px solid rgba(24,119,242,0.3);">📘 FB</span>
+          <div><div style="font-size:12px; color:#ccc;">6–8 AM · 12–2 PM · 7–9 PM</div><div style="font-size:10px; color:#555; margin-top:2px;">Best: Wed, Thu, Fri | Township groups peak at 7 PM</div></div>
+        </div>
+      </div>
+      <div style="background:#0D0D0D; border-radius:10px; padding:11px; margin-bottom:8px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="badge" style="background:rgba(225,48,108,0.2); color:#E1306C; border:1px solid rgba(225,48,108,0.3);">📸 IG</span>
+          <div><div style="font-size:12px; color:#ccc;">6–9 AM · 12–3 PM · 6–9 PM</div><div style="font-size:10px; color:#555; margin-top:2px;">Best: Mon, Wed, Fri | Stories get most views 8–10 PM</div></div>
+        </div>
+      </div>
+      <div style="background:#0D0D0D; border-radius:10px; padding:11px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="badge" style="background:rgba(105,201,208,0.2); color:#69C9D0; border:1px solid rgba(105,201,208,0.3);">🎵 TT</span>
+          <div><div style="font-size:12px; color:#ccc;">7–9 AM · 12–3 PM · 7–11 PM</div><div style="font-size:10px; color:#555; margin-top:2px;">Best: Tue, Thu, Sat | Trending sounds peak 7–9 PM</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STRATEGY TAB -->
+  <div class="content" id="tab-strategy" style="display:none;">
+    <div class="card">
+      <div class="section-label">PROMOTION PHASE ROADMAP</div>
+      <div class="phase-row">
+        <div class="phase-icon" style="background:rgba(99,102,241,0.2); border:2px solid #6366F1;">👀</div>
+        <div><div style="color:#6366F1; font-weight:700; font-size:12px; margin-bottom:3px;">AWARENESS <span style="color:#555; font-weight:400;">· 4+ weeks out</span></div><div style="color:#999; font-size:12px; line-height:1.6;">Introduce your brand/business. Share your story, why you started, and what makes you different. Focus on organic reach.</div></div>
+      </div>
+      <div class="phase-row">
+        <div class="phase-icon" style="background:rgba(139,92,246,0.2); border:2px solid #8B5CF6;">🔥</div>
+        <div><div style="color:#8B5CF6; font-weight:700; font-size:12px; margin-bottom:3px;">INTEREST <span style="color:#555; font-weight:400;">· 2–4 weeks out</span></div><div style="color:#999; font-size:12px; line-height:1.6;">Show your products/services in action. Behind-the-scenes, customer testimonials, price lists. Build trust.</div></div>
+      </div>
+      <div class="phase-row">
+        <div class="phase-icon" style="background:rgba(236,72,153,0.2); border:2px solid #EC4899;">⭐</div>
+        <div><div style="color:#EC4899; font-weight:700; font-size:12px; margin-bottom:3px;">DESIRE <span style="color:#555; font-weight:400;">· 1–2 weeks out</span></div><div style="color:#999; font-size:12px; line-height:1.6;">Limited offers, flash sales, countdowns. Create urgency. "Only 3 slots left this week!"</div></div>
+      </div>
+      <div class="phase-row">
+        <div class="phase-icon" style="background:rgba(245,158,11,0.2); border:2px solid #F59E0B;">📣</div>
+        <div><div style="color:#F59E0B; font-weight:700; font-size:12px; margin-bottom:3px;">ACTION <span style="color:#555; font-weight:400;">· Final week</span></div><div style="color:#999; font-size:12px; line-height:1.6;">Strong CTAs: "Book now", "DM to order", "Visit us today". Make it easy to buy.</div></div>
+      </div>
+      <div class="phase-row" style="margin-bottom:0;">
+        <div class="phase-icon" style="background:rgba(239,68,68,0.2); border:2px solid #EF4444;">🚀</div>
+        <div><div style="color:#EF4444; font-weight:700; font-size:12px; margin-bottom:3px;">RETAIN <span style="color:#555; font-weight:400;">· After sale</span></div><div style="color:#999; font-size:12px; line-height:1.6;">Thank customers, ask for reviews, share user-generated content. Turn one buyer into a regular.</div></div>
+      </div>
+    </div>
+
+    <div class="card card-gold">
+      <div class="section-label">POWER CTA TEMPLATES FOR TOWNSHIP BUSINESSES</div>
+      <div class="cta-row"><span class="cta-tag">BOOK</span><span style="color:#ccc; font-size:12px; line-height:1.6;">DM us NOW to book your slot — we only take 5 clients per day! 📲</span></div>
+      <div class="cta-row"><span class="cta-tag">SHARE</span><span style="color:#ccc; font-size:12px; line-height:1.6;">Tag a friend who needs this! 👇 Share in your WhatsApp status too 📤</span></div>
+      <div class="cta-row"><span class="cta-tag">SAVE</span><span style="color:#ccc; font-size:12px; line-height:1.6;">Save this post so you don't forget — our special ends Friday! 🔖</span></div>
+      <div class="cta-row"><span class="cta-tag">FOMO</span><span style="color:#ccc; font-size:12px; line-height:1.6;">Last 2 spots for this week. Don't sleep on it — book NOW 👆</span></div>
+      <div class="cta-row"><span class="cta-tag">UGC</span><span style="color:#ccc; font-size:12px; line-height:1.6;">Bought from us? Post and tag us — best review gets R50 off next visit! 💰</span></div>
+      <div class="cta-row"><span class="cta-tag">LOCATION</span><span style="color:#ccc; font-size:12px; line-height:1.6;">Find us on The Corner app — link in bio! 📍 Brits CBD, next to Shoprite</span></div>
+      <div class="cta-row" style="margin-bottom:0;"><span class="cta-tag">WHATSAPP</span><span style="color:#ccc; font-size:12px; line-height:1.6;">WhatsApp us on 081-234-5678 for instant quotes. We reply in 10 mins! ⚡</span></div>
+    </div>
+
+    <div class="card">
+      <div class="section-label">CONTENT THEME MIX</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+        <div style="background:#0D0D0D; border-radius:10px; padding:12px;"><div style="font-size:20px; margin-bottom:4px;">👀</div><div style="font-weight:700; font-size:12px;">Teaser</div><div style="color:#666; font-size:10px; margin-top:2px;">Build curiosity</div></div>
+        <div style="background:#0D0D0D; border-radius:10px; padding:12px;"><div style="font-size:20px; margin-bottom:4px;">⏰</div><div style="font-weight:700; font-size:12px;">Countdown</div><div style="color:#666; font-size:10px; margin-top:2px;">Create urgency</div></div>
+        <div style="background:#0D0D0D; border-radius:10px; padding:12px;"><div style="font-size:20px; margin-bottom:4px;">🎬</div><div style="font-weight:700; font-size:12px;">Behind the Scenes</div><div style="color:#666; font-size:10px; margin-top:2px;">Show authenticity</div></div>
+        <div style="background:#0D0D0D; border-radius:10px; padding:12px;"><div style="font-size:20px; margin-bottom:4px;">⭐</div><div style="font-weight:700; font-size:12px;">Customer Spotlight</div><div style="color:#666; font-size:10px; margin-top:2px;">Social proof</div></div>
+        <div style="background:#0D0D0D; border-radius:10px; padding:12px;"><div style="font-size:20px; margin-bottom:4px;">📣</div><div style="font-weight:700; font-size:12px;">Call to Action</div><div style="color:#666; font-size:10px; margin-top:2px;">Drive action</div></div>
+        <div style="background:#0D0D0D; border-radius:10px; padding:12px;"><div style="font-size:20px; margin-bottom:4px;">🤝</div><div style="font-weight:700; font-size:12px;">Community</div><div style="color:#666; font-size:10px; margin-top:2px;">Engage audience</div></div>
+        <div style="background:#0D0D0D; border-radius:10px; padding:12px;"><div style="font-size:20px; margin-bottom:4px;">💰</div><div style="font-weight:700; font-size:12px;">Price List</div><div style="color:#666; font-size:10px; margin-top:2px;">Transparency builds trust</div></div>
+        <div style="background:#0D0D0D; border-radius:10px; padding:12px;"><div style="font-size:20px; margin-bottom:4px;">📍</div><div style="font-weight:700; font-size:12px;">Location Drop</div><div style="color:#666; font-size:10px; margin-top:2px;">"Pull up on us"</div></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+// ── Provider Config ───────────────────────────────────────────────
+const PROVIDERS = {
+  anthropic: {
+    name: 'Anthropic Claude',
+    icon: '🟣',
+    keyPrefix: 'sk-ant',
+    placeholder: 'sk-ant-api03-...',
+    signupUrl: 'https://console.anthropic.com',
+    endpoint: 'https://api.anthropic.com/v1/messages',
+    headers: (key) => ({
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    }),
+    body: (prompt, model, imageData) => {
+      const content = imageData 
+        ? [
+            { type: 'text', text: prompt },
+            { type: 'image', source: { type: 'base64', media_type: imageData.type, data: imageData.data } }
+          ]
+        : [{ type: 'text', text: prompt }];
+      return JSON.stringify({
+        model: model || 'claude-sonnet-4-20250514',
+        max_tokens: 4000,
+        messages: [{ role: 'user', content }]
+      });
+    },
+    extract: (data) => data.content?.[0]?.text || ''
+  },
+  openai: {
+    name: 'OpenAI GPT-4o',
+    icon: '🟢',
+    keyPrefix: 'sk-',
+    placeholder: 'sk-proj-... or sk-...',
+    signupUrl: 'https://platform.openai.com',
+    endpoint: 'https://api.openai.com/v1/chat/completions',
+    headers: (key) => ({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + key
+    }),
+    body: (prompt, model, imageData) => {
+      const content = imageData
+        ? [
+            { type: 'text', text: prompt },
+            { type: 'image_url', image_url: { url: `data:${imageData.type};base64,${imageData.data}` } }
+          ]
+        : [{ type: 'text', text: prompt }];
+      return JSON.stringify({
+        model: model || 'gpt-4o',
+        max_tokens: 4000,
+        messages: [{ role: 'user', content }]
+      });
+    },
+    extract: (data) => data.choices?.[0]?.message?.content || ''
+  },
+  gemini: {
+    name: 'Google Gemini',
+    icon: '🔵',
+    keyPrefix: null,
+    placeholder: 'AIzaSy... or AQ...',
+    signupUrl: 'https://aistudio.google.com/app/apikey',
+    endpoint: null,
+    headers: () => ({ 'Content-Type': 'application/json' }),
+    body: (prompt, model, imageData) => {
+      const parts = [{ text: prompt }];
+      if (imageData) {
+        parts.push({
+          inline_data: {
+            mime_type: imageData.type,
+            data: imageData.data
+          }
+        });
+      }
+      return JSON.stringify({
+        contents: [{ parts }]
+      });
+    },
+    extract: (data) => data.candidates?.[0]?.content?.parts?.[0]?.text || '',
+    buildUrl: (key, model) => {
+      const m = model || 'gemini-2.5-flash';
+      return `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${key}`;
+    }
+  },
+  groq: {
+    name: 'Groq',
+    icon: '⚡',
+    keyPrefix: 'gsk_',
+    placeholder: 'gsk_...',
+    signupUrl: 'https://console.groq.com',
+    endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+    headers: (key) => ({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + key
+    }),
+    body: (prompt, model) => JSON.stringify({
+      model: model || 'llama-3.1-70b-versatile',
+      max_tokens: 4000,
+      messages: [{ role: 'user', content: prompt }]
+    }),
+    extract: (data) => data.choices?.[0]?.message?.content || ''
+  }
+};
+
+// ── State ─────────────────────────────────────────────────────────
+let apiKey = localStorage.getItem('corner_api_key') || '';
+let apiProvider = localStorage.getItem('corner_api_provider') || 'anthropic';
+let geminiModel = localStorage.getItem('corner_gemini_model') || 'gemini-2.5-flash';
+let selectedPlatforms = ['facebook','instagram','tiktok'];
+let daysToGenerate = 7;
+let plans = [];
+let generatedPlans = false;
+let openCards = new Set();
+let typedCards = new Set();
+let promoType = 'event';
+let uploadedMedia = [];
+let scheduledPosts = JSON.parse(localStorage.getItem('corner_scheduled') || '[]');
+let whatsappNumber = localStorage.getItem('corner_whatsapp') || '';
+let businessContacts = JSON.parse(localStorage.getItem('corner_contacts') || '{}');
+
+const PLATFORM_COLORS = { facebook:'#1877F2', instagram:'#E1306C', tiktok:'#69C9D0' };
+const PLATFORM_NAMES  = { facebook:'Facebook', instagram:'Instagram', tiktok:'TikTok' };
+const PLATFORM_EMOJIS = { facebook:'📘', instagram:'📸', tiktok:'🎵' };
+
+const PRESETS = {
+  popup: { name: 'Shop & Pop-Up Market', date: '2026-07-20', vibe: 'Vibrant African outdoor market with colourful clothes, food stalls, fashion, art and live DJ. Community gathering in Brits CBD.', community: 'Brits, North West', category: 'Events & Entertainment' },
+  o268: { name: 'O268 Market Summit', date: '2026-08-15', vibe: 'The biggest township business showcase in North West. Connecting vendors, entrepreneurs, and customers. Live music, fashion shows, food tasting, and networking.', community: 'Brits, North West', category: 'Events & Entertainment' },
+  food: { name: 'Mama\'s Kitchen', date: '2026-07-10', vibe: 'Authentic township cuisine — mogodu, pap and vleis, shisanyama. Daily specials, catering for events, and weekend platters. Taste of home.', community: 'Mabopane, Gauteng', category: 'Food & Catering' },
+  fashion: { name: 'Drip District', date: '2026-07-25', vibe: 'Latest streetwear, custom sneakers, and African print fashion. Youth-focused brand bringing fresh style to the township. New drop every Friday.', community: 'Atteridgeville, Gauteng', category: 'Fashion & Clothing' },
+  auto: { name: 'Precision Auto Spa', date: '2026-07-05', vibe: 'Premium car wash, full service, and detailing. We come to you or you pull up on us. Trusted by 200+ customers in Brits. Book your slot.', community: 'Brits, North West', category: 'Automotive' }
+};
+
+// ── Init ─────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  updateCountdown();
+  if (apiKey && PROVIDERS[apiProvider]) {
+    document.getElementById('apiScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    updateProviderChip();
+  }
+  const d = new Date();
+  d.setDate(d.getDate() + 14);
+  document.getElementById('eventDate').value = d.toISOString().split('T')[0];
+
+  if (whatsappNumber) {
+    document.getElementById('whatsappNumber').value = whatsappNumber;
+  }
+
+  // Load business contacts
+  if (businessContacts.whatsappLink) document.getElementById('whatsappLink').value = businessContacts.whatsappLink;
+  if (businessContacts.businessPhone) document.getElementById('businessPhone').value = businessContacts.businessPhone;
+  if (businessContacts.instagramHandle) document.getElementById('instagramHandle').value = businessContacts.instagramHandle;
+  if (businessContacts.facebookPage) document.getElementById('facebookPage').value = businessContacts.facebookPage;
+  if (businessContacts.websiteLink) document.getElementById('websiteLink').value = businessContacts.websiteLink;
+
+  const dz = document.getElementById('dropzone');
+  dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('dragover'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+  dz.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dz.classList.remove('dragover');
+    handleFiles(e.dataTransfer.files);
+  });
+
+  startNotificationChecker();
+  updateQueueBadge();
+});
+
+function updateCountdown() {
+  const target = new Date(document.getElementById('eventDate').value || '2026-07-15');
+  const now = new Date();
+  const days = Math.max(0, Math.ceil((target - now) / 86400000));
+  document.getElementById('daysLeft').textContent = days;
+
+  let phase, color;
+  if (days > 28) { phase = 'AWARENESS'; color = '#6366F1'; }
+  else if (days > 14) { phase = 'INTEREST'; color = '#8B5CF6'; }
+  else if (days > 7)  { phase = 'DESIRE'; color = '#EC4899'; }
+  else if (days > 1)  { phase = 'ACTION'; color = '#F59E0B'; }
+  else                { phase = 'LAUNCH DAY'; color = '#EF4444'; }
+
+  const badge = document.getElementById('phaseBadge');
+  badge.textContent = `📍 ${phase} PHASE`;
+  badge.style.background = color + '22';
+  badge.style.color = color;
+  badge.style.border = `1px solid ${color}44`;
+}
+
+// ── Provider Switching ────────────────────────────────────────────
+function setProvider(p, btn) {
+  apiProvider = p;
+  document.querySelectorAll('.provider-btn').forEach(el => el.classList.remove('active'));
+  btn.classList.add('active');
+
+  const cfg = PROVIDERS[p];
+  const input = document.getElementById('apiKeyInput');
+  const hint = document.getElementById('keyHint');
+  const link = document.getElementById('keyLink');
+  const modelSelector = document.getElementById('modelSelector');
+
+  input.placeholder = cfg.placeholder;
+  link.href = cfg.signupUrl;
+  link.textContent = cfg.signupUrl.replace('https://', '');
+
+  if (p === 'gemini') {
+    modelSelector.style.display = 'block';
+  } else {
+    modelSelector.style.display = 'none';
+  }
+}
+
+function updateGeminiModel(model) {
+  geminiModel = model;
+  localStorage.setItem('corner_gemini_model', model);
+}
+
+// ── Media Upload ──────────────────────────────────────────────────
+function handleFiles(files) {
+  const gallery = document.getElementById('mediaGallery');
+  const hint = document.getElementById('mediaHint');
+  const analyzeBtn = document.getElementById('analyzeBtn');
+
+  Array.from(files).forEach(file => {
+    if (!file.type.match(/image.*|video.*/)) return;
+    if (uploadedMedia.length >= 10) {
+      alert('Max 10 files allowed. Remove some first.');
+      return;
+    }
+
+    const id = 'media-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+    const url = URL.createObjectURL(file);
+    const isVideo = file.type.startsWith('video');
+
+    uploadedMedia.push({ id, file, type: isVideo ? 'video' : 'image', url, name: file.name });
+
+    const thumb = document.createElement('div');
+    thumb.className = 'media-thumb';
+    thumb.id = id;
+    thumb.innerHTML = `
+      ${isVideo 
+        ? `<video src="${url}" muted loop playsinline></video><div class="thumb-type">VIDEO</div>`
+        : `<img src="${url}" alt="">`
+      }
+      <div class="thumb-overlay">
+        <button class="thumb-remove" onclick="removeMedia('${id}')">✕</button>
+      </div>
+    `;
+    gallery.appendChild(thumb);
+  });
+
+  hint.textContent = uploadedMedia.length > 0 
+    ? `${uploadedMedia.length} file${uploadedMedia.length > 1 ? 's' : ''} uploaded · Tap to preview · Hover to remove`
+    : 'No media uploaded yet. Add photos of your product, stall, or event setup.';
+
+  // Enable analyze button if we have images
+  const hasImages = uploadedMedia.some(m => m.type === 'image');
+  analyzeBtn.disabled = !hasImages;
+}
+
+function removeMedia(id) {
+  const idx = uploadedMedia.findIndex(m => m.id === id);
+  if (idx > -1) {
+    URL.revokeObjectURL(uploadedMedia[idx].url);
+    uploadedMedia.splice(idx, 1);
+    document.getElementById(id).remove();
+    document.getElementById('mediaHint').textContent = uploadedMedia.length > 0 
+      ? `${uploadedMedia.length} file${uploadedMedia.length > 1 ? 's' : ''} uploaded`
+      : 'No media uploaded yet. Add photos of your product, stall, or event setup.';
+
+    const hasImages = uploadedMedia.some(m => m.type === 'image');
+    document.getElementById('analyzeBtn').disabled = !hasImages;
+  }
+}
+
+// ── AI Image Analysis ─────────────────────────────────────────────
+async function analyzeMedia() {
+  const btn = document.getElementById('analyzeBtn');
+  const resultDiv = document.getElementById('analysisResult');
+
+  const images = uploadedMedia.filter(m => m.type === 'image');
+  if (!images.length) {
+    alert('Upload at least one image first.');
+    return;
+  }
+
+  if (!apiKey) {
+    showApiScreen();
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading-dots">Analyzing</span>';
+  resultDiv.style.display = 'none';
+
+  try {
+    // Analyze first image (can be extended to multiple)
+    const image = images[0];
+    const base64 = await fileToBase64(image.file);
+    const mimeType = image.file.type;
+
+    const prompt = `Analyze this image and describe what you see in detail. This is for a South African township business or event. Describe:
+
+1. What the image shows (products, setup, people, atmosphere)
+2. The vibe/mood of the scene
+3. What type of business or event this could be
+4. Key visual elements that would appeal to social media audiences
+5. Suggested caption angles based on what's in the image
+
+Keep it authentic to township South African culture. Use local context where relevant.`;
+
+    const cfg = PROVIDERS[apiProvider];
+    const url = cfg.buildUrl ? cfg.buildUrl(apiKey, geminiModel) : cfg.endpoint;
+
+    const imageData = { type: mimeType, data: base64 };
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: cfg.headers(apiKey),
+      body: cfg.body(prompt, geminiModel, imageData)
+    });
+
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+
+    const analysis = cfg.extract(data);
+
+    // Display result
+    resultDiv.innerHTML = `
+      <div class="analysis-result">
+        <div class="ai-label">🔮 AI ANALYSIS</div>
+        <div>${analysis.replace(/\n/g, '<br>')}</div>
+      </div>
+      <button class="small-btn" onclick="useAnalysis()" style="margin-top:8px; width:100%;">Use This as Description</button>
+    `;
+    resultDiv.style.display = 'block';
+    resultDiv.dataset.analysis = analysis;
+
+  } catch(e) {
+    resultDiv.innerHTML = `<div class="error-box" style="margin-top:10px;">⚠️ ${e.message || 'Analysis failed. Try a different provider or check your API key.'}</div>`;
+    resultDiv.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🔮 AI Analyze Media';
+  }
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result.split(',')[1];
+      resolve(base64);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function useAnalysis() {
+  const resultDiv = document.getElementById('analysisResult');
+  const analysis = resultDiv.dataset.analysis;
+  if (analysis) {
+    document.getElementById('eventVibe').value = analysis;
+    resultDiv.innerHTML += '<div style="color:var(--green); font-size:12px; margin-top:8px;">✅ Description updated!</div>';
+  }
+}
+
+// ── Lightbox ──────────────────────────────────────────────────────
+function openLightbox(url, type, caption) {
+  const lb = document.getElementById('lightbox');
+  const img = document.getElementById('lightboxImg');
+  const vid = document.getElementById('lightboxVideo');
+  const cap = document.getElementById('lightboxCaption');
+
+  cap.textContent = caption || '';
+
+  if (type === 'video') {
+    img.style.display = 'none';
+    vid.style.display = 'block';
+    vid.src = url;
+    vid.play();
+  } else {
+    vid.style.display = 'none';
+    vid.pause();
+    img.style.display = 'block';
+    img.src = url;
+  }
+
+  lb.classList.add('active');
+}
+
+function closeLightbox() {
+  const lb = document.getElementById('lightbox');
+  const vid = document.getElementById('lightboxVideo');
+  lb.classList.remove('active');
+  vid.pause();
+  vid.src = '';
+}
+
+// ── API Key ───────────────────────────────────────────────────────
+function saveKey() {
+  const k = document.getElementById('apiKeyInput').value.trim();
+  const cfg = PROVIDERS[apiProvider];
+
+  if (apiProvider === 'gemini') {
+    if (!k.startsWith('AIza') && !k.startsWith('AQ.')) {
+      alert('Please enter a valid Google Gemini API key (starts with AIza... or AQ...)');
+      return;
+    }
+  } else if (!k.startsWith(cfg.keyPrefix)) {
+    alert(`Please enter a valid ${cfg.name} API key (starts with ${cfg.keyPrefix})`);
+    return;
+  }
+
+  apiKey = k;
+  localStorage.setItem('corner_api_key', k);
+  localStorage.setItem('corner_api_provider', apiProvider);
+  localStorage.setItem('corner_gemini_model', geminiModel);
+  document.getElementById('apiScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  updateProviderChip();
+}
+
+function skipKey() {
+  document.getElementById('apiScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+}
+
+function showApiScreen() {
+  const cfg = PROVIDERS[apiProvider];
+  document.getElementById('apiKeyInput').value = apiKey;
+  document.getElementById('apiKeyInput').placeholder = cfg.placeholder;
+
+  document.querySelectorAll('.provider-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('prov-' + apiProvider).classList.add('active');
+
+  const modelSelector = document.getElementById('modelSelector');
+  if (apiProvider === 'gemini') {
+    modelSelector.style.display = 'block';
+    document.getElementById('geminiModel').value = geminiModel;
+  } else {
+    modelSelector.style.display = 'none';
+  }
+
+  document.getElementById('apiScreen').style.display = 'flex';
+}
+
+function updateProviderChip() {
+  const cfg = PROVIDERS[apiProvider];
+  const chip = document.getElementById('activeProviderChip');
+  if (chip && cfg) {
+    let text = `${cfg.icon} ${cfg.name}`;
+    if (apiProvider === 'gemini') {
+      text += ` · ${geminiModel}`;
+    }
+    chip.textContent = text;
+  }
+}
+
+// ── Tab switching ─────────────────────────────────────────────────
+function switchTab(id, btn) {
+  document.querySelectorAll('.content').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + id).style.display = 'block';
+  btn.classList.add('active');
+
+  if (id === 'queue') {
+    renderQueue();
+  }
+}
+function switchTabById(id) {
+  document.querySelectorAll('.content').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + id).style.display = 'block';
+  document.querySelectorAll('.tab').forEach(el => {
+    if (el.textContent.toLowerCase().includes(id.slice(0,4))) el.classList.add('active');
+  });
+}
+
+// ── Type switching ────────────────────────────────────────────────
+function setType(type, btn) {
+  promoType = type;
+  document.querySelectorAll('.type-btn').forEach(el => el.classList.remove('active'));
+  btn.classList.add('active');
+
+  const nameLabel = document.getElementById('nameLabel');
+  const dateLabel = document.getElementById('dateLabel');
+  const vibeLabel = document.getElementById('vibeLabel');
+
+  if (type === 'event') {
+    nameLabel.textContent = 'Event / Market Name';
+    dateLabel.textContent = 'Event Date';
+    vibeLabel.textContent = 'Event Vibe / Description';
+    document.getElementById('presetCard').style.display = 'block';
+  } else if (type === 'business') {
+    nameLabel.textContent = 'Business Name';
+    dateLabel.textContent = 'Campaign Target Date';
+    vibeLabel.textContent = 'What You Offer / Your Story';
+    document.getElementById('presetCard').style.display = 'block';
+  } else if (type === 'product') {
+    nameLabel.textContent = 'Product / Service Name';
+    dateLabel.textContent = 'Launch / Sale Date';
+    vibeLabel.textContent = 'Product Description & Benefits';
+    document.getElementById('presetCard').style.display = 'none';
+  } else {
+    nameLabel.textContent = 'Brand / Business Name';
+    dateLabel.textContent = 'Campaign End Date';
+    vibeLabel.textContent = 'Brand Story & Values';
+    document.getElementById('presetCard').style.display = 'none';
+  }
+}
+
+function loadPreset(key) {
+  const p = PRESETS[key];
+  if (!p) return;
+  document.getElementById('eventName').value = p.name;
+  document.getElementById('eventDate').value = p.date;
+  document.getElementById('eventVibe').value = p.vibe;
+  document.getElementById('community').value = p.community;
+  document.getElementById('category').value = p.category;
+  updateCountdown();
+
+  document.querySelectorAll('.preset-chip').forEach(el => el.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+// ── Platform toggle ───────────────────────────────────────────────
+function togglePlatform(p, btn) {
+  const color = PLATFORM_COLORS[p];
+  if (selectedPlatforms.includes(p)) {
+    if (selectedPlatforms.length === 1) return;
+    selectedPlatforms = selectedPlatforms.filter(x => x !== p);
+    btn.style.borderColor = '#2a2a2a';
+    btn.style.color = '#555';
+    btn.style.background = '#0D0D0D';
+  } else {
+    selectedPlatforms.push(p);
+    btn.style.borderColor = color;
+    btn.style.color = color;
+    btn.style.background = color.replace(')', ', 0.1)').replace('rgb', 'rgba');
+  }
+}
+
+// ── Days picker ───────────────────────────────────────────────────
+function setDays(d, btn) {
+  daysToGenerate = d;
+  document.querySelectorAll('.day-btn').forEach(el => el.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('generateBtn').textContent = `⚡ GENERATE ${d}-DAY PLAN`;
+}
+
+// ── Copy caption ────────────────────────────────────────────────────
+function copyCaption(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = '📋 Copy Caption';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+// ── SCHEDULING FUNCTIONS ──────────────────────────────────────────
+
+function saveBusinessContacts() {
+  businessContacts = {
+    whatsappLink: document.getElementById('whatsappLink').value.trim(),
+    businessPhone: document.getElementById('businessPhone').value.trim(),
+    instagramHandle: document.getElementById('instagramHandle').value.trim(),
+    facebookPage: document.getElementById('facebookPage').value.trim(),
+    websiteLink: document.getElementById('websiteLink').value.trim()
+  };
+  localStorage.setItem('corner_contacts', JSON.stringify(businessContacts));
+}
+
+function schedulePost(dayIndex) {
+  const plan = plans[dayIndex];
+  if (!plan) return;
+
+  // Save all contact info
+  saveBusinessContacts();
+
+  const numInput = document.getElementById('whatsappNumber').value.trim();
+  if (numInput) {
+    whatsappNumber = numInput.replace(/\s/g, '');
+    localStorage.setItem('corner_whatsapp', whatsappNumber);
+  }
+
+  if (!whatsappNumber) {
+    alert('Enter your WhatsApp number in the Planner tab first.');
+    switchTabById('planner');
+    document.getElementById('whatsappNumber').focus();
+    return;
+  }
+
+  const now = new Date();
+  const scheduledTime = new Date(now);
+  scheduledTime.setDate(now.getDate() + plan.day);
+  scheduledTime.setHours(8, 0, 0, 0);
+
+  const existing = scheduledPosts.find(p => p.planDay === plan.day && p.planId === plan._id);
+  if (existing) {
+    alert(`Day ${plan.day} is already scheduled for ${new Date(existing.scheduledTime).toLocaleString()}`);
+    return;
+  }
+
+  const post = {
+    id: 'post-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+    planDay: plan.day,
+    planId: plan._id || plan.day,
+    theme: plan.theme,
+    emoji: plan.emoji,
+    platforms: plan.platforms || selectedPlatforms,
+    caption: plan.caption,
+    cta: plan.cta,
+    hashtags: plan.hashtags || [],
+    bestTime: plan.bestTime,
+    visual: plan.visual,
+    mediaSuggestion: plan.mediaSuggestion,
+    scheduledTime: scheduledTime.toISOString(),
+    status: 'scheduled',
+    createdAt: new Date().toISOString()
+  };
+
+  scheduledPosts.push(post);
+  localStorage.setItem('corner_scheduled', JSON.stringify(scheduledPosts));
+
+  updateQueueBadge();
+  renderPlans();
+
+  sendWhatsAppConfirmation(post);
+
+  alert(`✅ Day ${plan.day} scheduled for ${scheduledTime.toLocaleDateString()} at 8:00 AM\n\nYou'll get a WhatsApp reminder 5 mins before posting.`);
+}
+
+function sendWhatsAppConfirmation(post) {
+  if (!whatsappNumber) return;
+
+  const formattedNum = whatsappNumber.startsWith('27') ? whatsappNumber : '27' + whatsappNumber.replace(/^0/, '');
+  const message = encodeURIComponent(
+    `📅 *The Corner Agent — Scheduled*\n\n` +
+    `Day ${post.planDay}: ${post.theme} ${post.emoji}\n` +
+    `Date: ${new Date(post.scheduledTime).toLocaleDateString()} at 8:00 AM\n\n` +
+    `You'll get another reminder 5 mins before it's time to post.\n\n` +
+    `View your queue in the Agent app.`
+  );
+
+  window.open(`https://wa.me/${formattedNum}?text=${message}`, '_blank');
+}
+
+function sendWhatsAppReminder(post) {
+  if (!whatsappNumber || post.status !== 'scheduled') return;
+
+  const formattedNum = whatsappNumber.startsWith('27') ? whatsappNumber : '27' + whatsappNumber.replace(/^0/, '');
+  const platforms = post.platforms.map(p => PLATFORM_EMOJIS[p] + ' ' + PLATFORM_NAMES[p]).join('\n');
+  const caption = post.caption.substring(0, 300) + (post.caption.length > 300 ? '...' : '');
+
+  const message = encodeURIComponent(
+    `⏰ *TIME TO POST — The Corner*\n\n` +
+    `Day ${post.planDay}: ${post.theme} ${post.emoji}\n\n` +
+    `*Platforms:*\n${platforms}\n\n` +
+    `*Caption:*\n${caption}\n\n` +
+    `*Hashtags:*\n${post.hashtags.join(' ')}\n\n` +
+    `*CTA:* ${post.cta}\n\n` +
+    `Tap to copy and open the app:`
+  );
+
+  window.open(`https://wa.me/${formattedNum}?text=${message}`, '_blank');
+
+  post.status = 'posted';
+  post.postedAt = new Date().toISOString();
+  localStorage.setItem('corner_scheduled', JSON.stringify(scheduledPosts));
+  updateQueueBadge();
+
+  if (document.getElementById('tab-queue').style.display !== 'none') {
+    renderQueue();
+  }
+}
+
+function startNotificationChecker() {
+  setInterval(() => {
+    checkScheduledPosts();
+  }, 60000);
+  checkScheduledPosts();
+}
+
+function checkScheduledPosts() {
+  const now = new Date();
+
+  scheduledPosts.forEach(post => {
+    if (post.status !== 'scheduled') return;
+
+    const postTime = new Date(post.scheduledTime);
+    const diffMs = postTime - now;
+    const diffMins = Math.floor(diffMs / 60000);
+
+    if (diffMins <= 5 && diffMins > 0 && !post.reminderSent) {
+      post.reminderSent = true;
+      localStorage.setItem('corner_scheduled', JSON.stringify(scheduledPosts));
+      sendWhatsAppReminder(post);
+    }
+
+    if (diffMins <= -30 && post.status === 'scheduled') {
+      post.status = 'posted';
+      post.postedAt = now.toISOString();
+      localStorage.setItem('corner_scheduled', JSON.stringify(scheduledPosts));
+      updateQueueBadge();
+    }
+  });
+}
+
+function updateQueueBadge() {
+  const scheduled = scheduledPosts.filter(p => p.status === 'scheduled').length;
+  const badge = document.getElementById('queueBadge');
+  if (scheduled > 0) {
+    badge.textContent = scheduled;
+    badge.style.display = 'inline-block';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function renderQueue() {
+  const empty = document.getElementById('queueEmpty');
+  const content = document.getElementById('queueContent');
+  const list = document.getElementById('queueList');
+
+  if (!scheduledPosts.length) {
+    empty.style.display = 'block';
+    content.style.display = 'none';
+    return;
+  }
+
+  empty.style.display = 'none';
+  content.style.display = 'block';
+  list.innerHTML = '';
+
+  const sorted = [...scheduledPosts].sort((a, b) => new Date(a.scheduledTime) - new Date(b.scheduledTime));
+
+  sorted.forEach(post => {
+    const item = document.createElement('div');
+    item.className = `queue-item ${post.status}`;
+
+    const platformBadges = (post.platforms || []).map(p => {
+      const c = PLATFORM_COLORS[p] || '#888';
+      return `<span class="badge" style="background:${c}22; color:${c}; border:1px solid ${c}44;">${PLATFORM_EMOJIS[p] || ''} ${PLATFORM_NAMES[p]}</span>`;
+    }).join('');
+
+    const statusClass = post.status === 'scheduled' ? 'status-scheduled' : 'status-posted';
+    const statusText = post.status === 'scheduled' ? 'SCHEDULED' : 'POSTED';
+    const timeText = post.status === 'scheduled' 
+      ? new Date(post.scheduledTime).toLocaleString()
+      : `Posted ${new Date(post.postedAt).toLocaleString()}`;
+
+    item.innerHTML = `
+      <div class="queue-header">
+        <div class="plan-icon ${post.status}">${post.emoji}</div>
+        <div class="plan-meta">
+          <div class="plan-title">Day ${post.planDay} — ${post.theme}</div>
+          <div style="margin-top:3px;">${platformBadges}</div>
+          <div class="queue-time">${timeText}</div>
+        </div>
+        <span class="queue-status ${statusClass}">${statusText}</span>
+      </div>
+      <div class="caption-box" style="margin-top:8px; font-size:11px;">${post.caption.substring(0, 200)}${post.caption.length > 200 ? '...' : ''}</div>
+      <div class="queue-actions">
+        ${post.status === 'scheduled' ? `
+          <button class="queue-btn primary" onclick="sendWhatsAppReminderById('${post.id}')">📱 Send Now</button>
+          <button class="queue-btn" onclick="copyQueueCaption('${post.id}')">📋 Copy</button>
+          <button class="queue-btn danger" onclick="deleteScheduled('${post.id}')">🗑 Delete</button>
+        ` : `
+          <button class="queue-btn" onclick="copyQueueCaption('${post.id}')">📋 Copy</button>
+          <button class="queue-btn danger" onclick="deleteScheduled('${post.id}')">🗑 Delete</button>
+        `}
+      </div>
+    `;
+    list.appendChild(item);
+  });
+}
+
+function sendWhatsAppReminderById(postId) {
+  const post = scheduledPosts.find(p => p.id === postId);
+  if (post) {
+    sendWhatsAppReminder(post);
+  }
+}
+
+function copyQueueCaption(postId) {
+  const post = scheduledPosts.find(p => p.id === postId);
+  if (post) {
+    navigator.clipboard.writeText(post.caption + '\n\n' + post.hashtags.join(' ')).then(() => {
+      alert('Caption copied to clipboard!');
+    });
+  }
+}
+
+function deleteScheduled(postId) {
+  if (!confirm('Delete this scheduled post?')) return;
+  scheduledPosts = scheduledPosts.filter(p => p.id !== postId);
+  localStorage.setItem('corner_scheduled', JSON.stringify(scheduledPosts));
+  updateQueueBadge();
+  renderQueue();
+}
+
+function clearAllScheduled() {
+  if (!confirm('Clear all scheduled posts? This cannot be undone.')) return;
+  scheduledPosts = [];
+  localStorage.setItem('corner_scheduled', JSON.stringify(scheduledPosts));
+  updateQueueBadge();
+  renderQueue();
+}
+
+function postNow(dayIndex) {
+  const plan = plans[dayIndex];
+  if (!plan) return;
+
+  saveBusinessContacts();
+
+  const numInput = document.getElementById('whatsappNumber').value.trim();
+  if (numInput) {
+    whatsappNumber = numInput.replace(/\s/g, '');
+    localStorage.setItem('corner_whatsapp', whatsappNumber);
+  }
+
+  const formattedNum = whatsappNumber.startsWith('27') ? whatsappNumber : '27' + whatsappNumber.replace(/^0/, '');
+  const platforms = (plan.platforms || selectedPlatforms).map(p => PLATFORM_EMOJIS[p] + ' ' + PLATFORM_NAMES[p]).join('\n');
+
+  const message = encodeURIComponent(
+    `⚡ *POST NOW — The Corner*\n\n` +
+    `Day ${plan.day}: ${plan.theme} ${plan.emoji}\n\n` +
+    `*Platforms:*\n${platforms}\n\n` +
+    `*Caption:*\n${plan.caption}\n\n` +
+    `*Hashtags:*\n${(plan.hashtags || []).join(' ')}\n\n` +
+    `*CTA:* ${plan.cta}\n\n` +
+    `Copy this caption and post now!`
+  );
+
+  window.open(`https://wa.me/${formattedNum}?text=${message}`, '_blank');
+}
+
+// ── Generate plan ─────────────────────────────────────────────────
+async function generatePlan() {
+  if (!apiKey) { showApiScreen(); return; }
+
+  const btn = document.getElementById('generateBtn');
+  const errBox = document.getElementById('errorBox');
+  errBox.style.display = 'none';
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading-dots">Generating your plan</span>';
+
+  // Save business contacts
+  saveBusinessContacts();
+
+  const eventName = document.getElementById('eventName').value;
+  const eventDate = document.getElementById('eventDate').value;
+  const vibe = document.getElementById('eventVibe').value;
+  const community = document.getElementById('community').value;
+  const category = document.getElementById('category').value;
+  const target = new Date(eventDate);
+  const daysLeft = Math.max(0, Math.ceil((target - new Date()) / 86400000));
+
+  const typeLabels = {
+    event: 'event or market',
+    business: 'business',
+    product: 'product or service',
+    brand: 'brand'
+  };
+
+  // Build contact info for AI
+  let contactInfo = '';
+  if (businessContacts.whatsappLink) contactInfo += `WhatsApp: ${businessContacts.whatsappLink}\n`;
+  if (businessContacts.businessPhone) contactInfo += `Phone: ${businessContacts.businessPhone}\n`;
+  if (businessContacts.instagramHandle) contactInfo += `Instagram: ${businessContacts.instagramHandle}\n`;
+  if (businessContacts.facebookPage) contactInfo += `Facebook: ${businessContacts.facebookPage}\n`;
+  if (businessContacts.websiteLink) contactInfo += `Website: ${businessContacts.websiteLink}\n`;
+
+  const mediaContext = uploadedMedia.length > 0 
+    ? `The user has uploaded ${uploadedMedia.length} media file(s): ${uploadedMedia.map(m => m.type === 'video' ? 'a video' : 'a photo').join(', ')}. Suggest which file to use for each day and describe how to feature it.`
+    : 'No media uploaded. Suggest what content to film or photograph.';
+
+  const prompt = `You are a social media strategist for South African township businesses and events. Generate a ${daysToGenerate}-day daily social media promotion plan for:
+
+TYPE: ${typeLabels[promoType]}
+NAME: ${eventName}
+TARGET DATE: ${eventDate}
+DESCRIPTION: ${vibe}
+COMMUNITY: ${community}
+CATEGORY: ${category}
+PLATFORMS: ${selectedPlatforms.join(', ')}
+DAYS TO TARGET: ~${daysLeft} days
+${contactInfo ? 'BUSINESS CONTACT INFO (use in CTAs naturally):\n' + contactInfo : ''}
+${mediaContext}
+
+Return ONLY a valid JSON array (no markdown, no code blocks) with exactly ${daysToGenerate} objects. Each object must have:
+{
+  "day": number,
+  "theme": string (Teaser / Countdown / Behind the Scenes / Customer Spotlight / Product Showcase / Call to Action / Community Content / Price List / Location Drop),
+  "emoji": string (single emoji),
+  "platforms": array from: ${selectedPlatforms.map(p => `"${p}"`).join(', ')},
+  "time": string (e.g. "Morning 08:00"),
+  "format": string (e.g. "Reel + Story" or "Carousel + Caption"),
+  "caption": string (full caption with emojis, 80-150 words, authentic township South African voice — use local slang naturally like "pull up", "sharp", "mzansi", "lekker", "drip", "vibe"),
+  "cta": string (specific CTA, 20-40 words, WhatsApp-friendly. Include business contact info naturally where relevant),
+  "visual": string (visual production tip, 20-35 words, phone-friendly),
+  "hashtags": array of 6-8 hashtag strings including #TheCorner #TownshipBusiness,
+  "bestTime": string (e.g. "7:00–9:00 PM"),
+  "reach": string (e.g. "High — 800–1.5K"),
+  "mediaSuggestion": string (which uploaded media to use, or what to film/photograph, 15-25 words)
+}
+Make captions feel real, local, South African township style. Use authentic language that resonates with Brits, Mabopane, Atteridgeville audiences. Include township business culture references naturally. If business contact info is provided, weave it into CTAs naturally — e.g. "WhatsApp us on [number]" or "Find us on Instagram @[handle]".`;
+
+  try {
+    const cfg = PROVIDERS[apiProvider];
+    const url = cfg.buildUrl ? cfg.buildUrl(apiKey, geminiModel) : cfg.endpoint;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: cfg.headers(apiKey),
+      body: cfg.body(prompt, geminiModel)
+    });
+
+    const data = await response.json();
+
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+
+    const raw = cfg.extract(data);
+    const cleaned = raw.replace(/```json|```/g, '').trim();
+    plans = JSON.parse(cleaned);
+
+    plans.forEach((plan, i) => {
+      plan._id = 'plan-' + Date.now() + '-' + i;
+    });
+
+    generatedPlans = true;
+    openCards.clear();
+    typedCards.clear();
+    renderPlans();
+    switchTabById('plans');
+  } catch(e) {
+    errBox.textContent = '⚠️ ' + (e.message || 'Failed to generate. Check your API key and try again. If using Gemini, try a different model from the dropdown.');
+    errBox.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = `⚡ GENERATE ${daysToGenerate}-DAY PLAN`;
+  }
+}
+
+// ── Render plans ──────────────────────────────────────────────────
+function renderPlans() {
+  const empty = document.getElementById('plansEmpty');
+  const content = document.getElementById('plansContent');
+  const list = document.getElementById('plansList');
+  const title = document.getElementById('plansTitle');
+
+  if (!generatedPlans || !plans.length) {
+    empty.style.display = 'block'; content.style.display = 'none'; return;
+  }
+  empty.style.display = 'none'; content.style.display = 'block';
+  title.textContent = `Your ${plans.length}-Day Plan`;
+  list.innerHTML = '';
+
+  plans.forEach((plan, i) => {
+    const card = document.createElement('div');
+    card.className = 'plan-card';
+    card.id = 'plancard-' + i;
+
+    const isScheduled = scheduledPosts.some(p => p.planDay === plan.day && p.status === 'scheduled');
+    if (isScheduled) {
+      card.classList.add('scheduled');
+    }
+
+    const platformBadges = (plan.platforms || selectedPlatforms).map(p => {
+      const c = PLATFORM_COLORS[p] || '#888';
+      return `<span class="badge" style="background:${c}22; color:${c}; border:1px solid ${c}44;">${PLATFORM_EMOJIS[p] || ''} ${PLATFORM_NAMES[p] || p}</span>`;
+    }).join('');
+
+    let mediaStrip = '';
+    if (uploadedMedia.length > 0) {
+      const mediaIndex = i % uploadedMedia.length;
+      const m = uploadedMedia[mediaIndex];
+      mediaStrip = `
+        <div class="plan-media-strip">
+          <div class="plan-media-item" onclick="openLightbox('${m.url}', '${m.type}', 'Day ${plan.day} — ${plan.theme}')">
+            ${m.type === 'video' 
+              ? `<video src="${m.url}" muted playsinline></video><div class="pm-label">▶ VIDEO</div>`
+              : `<img src="${m.url}" alt=""><div class="pm-label">📷 PHOTO</div>`
+            }
+          </div>
+          ${uploadedMedia.length > 1 ? `
+            <div style="display:flex; flex-direction:column; justify-content:center; padding-left:4px;">
+              <div style="color:#555; font-size:10px; font-weight:700;">MEDIA ${mediaIndex + 1}/${uploadedMedia.length}</div>
+              <div style="color:#888; font-size:11px; margin-top:4px; max-width:120px; line-height:1.4;">${plan.mediaSuggestion || 'Use this for your post'}</div>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    const scheduleButtons = isScheduled ? `
+      <div class="schedule-actions">
+        <button class="schedule-btn" disabled>✅ Scheduled</button>
+        <button class="post-now-btn" onclick="postNow(${i})">⚡ Post Now</button>
+      </div>
+    ` : `
+      <div class="schedule-actions">
+        <button class="schedule-btn" onclick="schedulePost(${i})">📅 Schedule</button>
+        <button class="post-now-btn" onclick="postNow(${i})">⚡ Post Now</button>
+      </div>
+    `;
+
+    card.innerHTML = `
+      <div class="plan-header" onclick="toggleCard(${i})">
+        <div class="plan-icon ${isScheduled ? 'scheduled' : ''}">${plan.emoji}</div>
+        <div class="plan-meta">
+          <div class="plan-title">Day ${plan.day} — ${plan.theme}</div>
+          <div style="margin-top:3px;">${platformBadges}</div>
+          <div class="plan-sub">${plan.time} · ${plan.format}</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          ${uploadedMedia.length > 0 ? `<span class="media-badge">🖼 ${uploadedMedia.length}</span>` : ''}
+          ${isScheduled ? '<span class="media-badge" style="background:var(--green-dim); color:var(--green); border-color:rgba(37,211,102,0.3);">📅 SCHEDULED</span>' : ''}
+          <div class="plan-arrow">›</div>
+        </div>
+      </div>
+      <div class="plan-body" id="planbody-${i}" style="display:none;">
+        ${mediaStrip}
+        <div class="caption-box" id="caption-${i}"></div>
+        <button class="copy-btn" onclick="copyCaption(plans[${i}].caption, this)">📋 Copy Caption</button>
+        ${scheduleButtons}
+        <div class="two-col">
+          <div class="info-box">
+            <div class="info-label" style="color:#D4A843;">CALL TO ACTION</div>
+            <div class="info-text">${plan.cta}</div>
+          </div>
+          <div class="info-box">
+            <div class="info-label" style="color:#69C9D0;">VISUAL IDEA</div>
+            <div class="info-text">${plan.visual}</div>
+          </div>
+        </div>
+        ${plan.mediaSuggestion ? `
+          <div class="info-box" style="margin-top:8px;">
+            <div class="info-label" style="color:#8B5CF6;">📸 MEDIA TIP</div>
+            <div class="info-text">${plan.mediaSuggestion}</div>
+          </div>
+        ` : ''}
+        <div class="hashtag-row">${(plan.hashtags||[]).map(h => `<span class="hashtag">${h}</span>`).join('')}</div>
+        <div class="time-bar">
+          <span>⏱</span>
+          <span style="color:#888;">Best time:</span>
+          <span style="color:#fff; font-weight:700;">${plan.bestTime}</span>
+          <span style="margin-left:auto; color:#666;">Reach:</span>
+          <span style="color:#D4A843; font-weight:700;">${plan.reach}</span>
+        </div>
+      </div>`;
+    list.appendChild(card);
+  });
+}
+
+function toggleCard(i) {
+  const card = document.getElementById('plancard-' + i);
+  const body = document.getElementById('planbody-' + i);
+  const caption = document.getElementById('caption-' + i);
+  const isOpen = openCards.has(i);
+
+  if (isOpen) {
+    openCards.delete(i);
+    card.classList.remove('open');
+    body.style.display = 'none';
+  } else {
+    openCards.add(i);
+    card.classList.add('open');
+    body.style.display = 'block';
+
+    if (!typedCards.has(i)) {
+      typedCards.add(i);
+      typeCaption(caption, plans[i].caption);
+    }
+  }
+}
+
+function typeCaption(el, text, speed = 14) {
+  let idx = 0;
+  el.innerHTML = '<span class="cursor">▋</span>';
+  const interval = setInterval(() => {
+    if (idx >= text.length) {
+      el.textContent = text;
+      clearInterval(interval);
+      return;
+    }
+    el.innerHTML = text.slice(0, idx + 1) + '<span class="cursor">▋</span>';
+    idx++;
+  }, speed);
+}
+</script>
+</body>
+</html>
